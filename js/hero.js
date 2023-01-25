@@ -10,7 +10,8 @@ function createHero(board) {
         pos: { i: 12, j: 5 },
         isShoot: false
     }
-    board[gHero.pos.i][gHero.pos.j] = HERO
+    board[gHero.pos.i][gHero.pos.j].gameObject = HERO
+
 }
 
 // Handle game keys
@@ -22,10 +23,10 @@ function onKeyDown(ev) {
     const nextCell = gBoard[nextLocation.i][nextLocation.j]
     // moving from current location:
     // update the model
-    gBoard[gHero.pos.i][gHero.pos.j] = EMPTY
+    gBoard[gHero.pos.i][gHero.pos.j] = SKY
 
     // update the DOM
-    renderCell(gHero.pos, EMPTY)
+    renderCell(gHero.pos, SKY)
 
     // Move the pacman to new location:
     // update the model
@@ -88,8 +89,8 @@ function blinkLaser(pos) {
     renderCell(newPos, LASER)
     gHero.isShoot = true
     setTimeout(() => {
-        gBoard[newPos.i][newPos.j] = EMPTY
-        renderCell(newPos, EMPTY)
+        gBoard[newPos.i][newPos.j] = SKY
+        renderCell(newPos, SKY)
         gHero.isShoot = false
         pos.i--
         blinkLaser(newPos)

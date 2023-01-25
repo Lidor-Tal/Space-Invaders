@@ -6,7 +6,8 @@ const ALIENS_ROW_COUNT = 3
 const HERO = '♆';
 const ALIEN = '👽'
 const LASER = '⤊';
-const EMPTY = ''
+
+const SKY = ''
 
 var gBoard;
 var gGame = {
@@ -21,6 +22,7 @@ function init() {
     createHero(gBoard)
 
     renderBoard(gBoard, '.board-container')
+    moveAliens()
 }
 
 function createBoard() {
@@ -31,7 +33,8 @@ function createBoard() {
     for (var i = 0; i < size; i++) {
         board.push([])
         for (var j = 0; j < size; j++) {
-            board[i][j] = ''
+            var cell = createCell()
+            board[i][j] = cell
         }
     }
     return board
@@ -91,5 +94,6 @@ function createCell(gameObject = null) {
 function updateCell(pos, gameObject = null) {
     gBoard[pos.i][pos.j].gameObject = gameObject;
     var elCell = getElCell(pos);
+    console.log(elCell)
     elCell.innerHTML = gameObject || '';
 }

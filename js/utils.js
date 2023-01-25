@@ -8,10 +8,23 @@ function renderBoard(mat, selector) {
         strHTML += '<tr>'
         for (var j = 0; j < mat[0].length; j++) {
 
-            const cell = mat[i][j]
+            var Currcell = mat[i][j]
             const className = `cell cell-${i}-${j}`
+            if (Currcell === SKY) {
+                cellClass += 'sky'
+            }
+            strHTML += `<td class="${className}">`
+            switch (Currcell.gameObject) {
+                case HERO:
+                    strHTML += HERO
+                    break
+                case ALIEN:
+                    strHTML += ALIEN
+                    break
+            }
 
-            strHTML += `<td class="${className}">${cell}</td>`
+
+            strHTML += `</td>`
         }
         strHTML += '</tr>'
     }
@@ -20,6 +33,7 @@ function renderBoard(mat, selector) {
     const elContainer = document.querySelector(selector)
     elContainer.innerHTML = strHTML
 }
+
 
 // location is an object like this - { i: 2, j: 7 }
 function renderCell(location, value,) {
@@ -37,7 +51,7 @@ function createCell(gameObject = null) {
 }
 
 function getElCell(pos) {
-    return document.querySelector(`[data-i='${pos.i}'][data-j='${pos.j}']`);
+    return document.querySelector(`.cell-${pos.i}-${pos.j}`);
 }
 
 function getClassName(location) {
