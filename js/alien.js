@@ -8,7 +8,7 @@ var gIntervalAliens;
 // (1) shifting down and (2) last alien was cleared from row
 var gAliensTopRowIdx = 2
 var gAliensBottomRowIdx = ALIENS_ROW_COUNT - 1
-var gIsAlienFreeze = true;
+var gIsAlienFreeze = false;
 
 var gLeftInterval
 var gRightInterval
@@ -31,7 +31,7 @@ function createAliens(board) {
 
 function handleAlienHit(pos) {
     playSound('sound/hit.wav')
-    updateCell(pos, SKY)
+    updateCell(pos, null)
     gGame.aliensCount--
     updateScore(10)
     checkWin()
@@ -40,13 +40,15 @@ function handleAlienHit(pos) {
 function moveAliens() {
     if (gAliensTopRowIdx === 11) {
         openModal('Dont worry Next Time is Yours', false)
+        clearInterval(gIntervalAliens)
         return
     }
     if (gGame.aliensCount === 0) {
         openModal('We Survived Anther Day', true)
+        clearInterval(gIntervalAliens)
         return
     }
-    if (!gIsAlienFreeze) return
+    if (gIsAlienFreeze) return
     if (gGoDown) {
         shiftBoardDown(gBoard, gAliensTopRowIdx)
     } else if ((gGoRight) && (!gGoDown)) {
@@ -70,7 +72,7 @@ function shiftBoardRight(board, fromI) {
             diff++
         } else if (currCell.gameObject === ALIEN) {
             break
-        }
+        } else continue
     }
 
     if (diff === 0) {
@@ -90,12 +92,13 @@ function shiftBoardRight(board, fromI) {
         gBoard[cell.i][cell.j].gameObject = null
         updateCell(cell, null)
         cell.j++
-
         //if the Cell is hitting an ARROW
-        if (gBoard[cell.i][cell.j].gameObject === LASER) {
+        if (gBoard[cell.i][cell.j].gameObject === undefined) {
+            gBoard[cell.i][gBoard.j].gameObject = null
+        } else if (gBoard[cell.i][cell.j].gameObject === undefined) {
             handleAlienHit(cell)
-            clearInterval(gShootInterval)
-            return
+        } else if (gBoard[cell.i][cell.j] === SUPER_LASER) {
+            updateCell(cell, null)
         }
         //modal & DOM
         gBoard[cell.i][cell.j].gameObject = ALIEN
@@ -112,7 +115,7 @@ function shiftBoardLeft(board, fromI) {
             diff++
         } else if (currCell.gameObject === ALIEN) {
             break
-        }
+        } else continue
     }
 
     if (diff === 0) {
@@ -134,10 +137,12 @@ function shiftBoardLeft(board, fromI) {
         cell.j--
 
         //if the Cell is hitting an ARROW
-        if (gBoard[cell.i][cell.j].gameObject === LASER) {
+        if (gBoard[cell.i][cell.j].gameObject === undefined) {
+            gBoard[cell.i][gBoard.j].gameObject = null
+        } else if (gBoard[cell.i][cell.j].gameObject === undefined) {
             handleAlienHit(cell)
-            clearInterval(gShootInterval)
-            return
+        } else if (gBoard[cell.i][cell.j] === SUPER_LASER) {
+            updateCell(cell, null)
         }
         //modal & DOM
         gBoard[cell.i][cell.j].gameObject = ALIEN
@@ -159,10 +164,12 @@ function shiftBoardDown(board) {
         cell.i++
 
         //if the Cell is hitting an ARROW
-        if (gBoard[cell.i][cell.j].gameObject === LASER) {
+        if (gBoard[cell.i][cell.j].gameObject === undefined) {
+            gBoard[cell.i][gBoard.j].gameObject = null
+        } else if (gBoard[cell.i][cell.j].gameObject === undefined) {
             handleAlienHit(cell)
-            clearInterval(gShootInterval)
-            return
+        } else if (gBoard[cell.i][cell.j] === SUPER_LASER) {
+            updateCell(cell, null)
         }
 
         //modal & DOM

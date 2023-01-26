@@ -10,9 +10,6 @@ function renderBoard(mat, selector) {
 
             var Currcell = mat[i][j]
             const className = `cell cell-${i}-${j}`
-            if (Currcell === SKY) {
-                cellClass += 'sky'
-            }
             strHTML += `<td class="${className}">`
             switch (Currcell.gameObject) {
                 case HERO:
@@ -62,4 +59,10 @@ function getClassName(location) {
 function playSound(path) {
     var audio = new Audio(path);
     audio.play()
+}
+
+function getRandomIntInclusive(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1) + min)
 }

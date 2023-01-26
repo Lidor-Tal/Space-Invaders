@@ -6,7 +6,9 @@ const ALIENS_ROW_COUNT = 3
 const HERO = `<img src="img/spaceship.png" alt="" srcset="">`
 const ALIEN = '👾'
 const LASER = '⤊';
-
+const SUPER_LASER = '🧨'
+const CANDY = '🍬'
+var gCandyInterval
 const SKY = ''
 
 var gBoard;
@@ -22,7 +24,9 @@ function init() {
     createHero(gBoard)
 
     renderBoard(gBoard, '.board-container')
-    // moveAliens()
+    gIntervalAliens = moveAliens()
+    gCandyInterval = setInterval(addSpaceCandies, 10000)
+
 }
 
 function createBoard() {
@@ -55,6 +59,10 @@ function checkWin() {
 function openModal(text, isWin) {
     clearInterval(gLeftInterval)
     clearInterval(gLeftInterval)
+    clearInterval(gIntervalAliens)
+    clearInterval(gShootInterval)
+    clearInterval(gSupershootInterval)
+
     gGame.isOn = false
     var strColor = ''
     strColor += (isWin) ? 'lightgreen' : 'lightblue'
@@ -75,6 +83,8 @@ function restartGame() {
     clearInterval(gLeftInterval)
     clearInterval(gRightInterval)
     clearInterval(gShootInterval)
+
+    gSuperShotCounter = 3
     gAliensTopRowIdx = 2
     gGoDown = false
     gGoRight = true
@@ -93,6 +103,22 @@ function restartGame() {
     elModal.style.display = 'none'
 
     init()
+}
+
+
+function addSpaceCandies() {
+    var emptyLoaction = []
+    for (var j = 0; j < gBoard.length; j++) {
+        var currCell = gBoard[0][j]
+        emptyLoaction.push({ i: 0, j: j })
+    }
+    var rndCell = emptyLoaction[getRandomIntInclusive(0, emptyLoaction.length - 1)]
+    gBoard[0][rndCell.j].gameObject = CANDY
+    updateCell(rndCell, CANDY)
+    setTimeout(() => {
+        gBoard[0][rndCell.j].gameObject = CANDY
+        updateCell(rndCell, null)
+    }, 5000);
 }
 
 function createCell(gameObject = null) {
