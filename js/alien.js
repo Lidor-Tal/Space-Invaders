@@ -6,20 +6,22 @@ var gIntervalAliens;
 // that we should shift (left, right, and bottom)
 // We need to update those when:
 // (1) shifting down and (2) last alien was cleared from row
-var gAliensTopRowIdx;
-var gAliensBottomRowIdx;
+var gAliensTopRowIdx = 2
+var gAliensBottomRowIdx = ALIENS_ROW_COUNT - 1
 var gIsAlienFreeze = true;
 
+var gLeftInterval
+var gRightInterval
+
+var gGoDown = false
+var gGoRight = true
 
 
 function createAliens(board) {
-    for (var i = 0; i < board.length; i++) {
-
-        for (var j = 0; j < board[0].length; j++) {
-
-            if (i === 2 && j > 1 && j < 12) {
-
-                board[i][j].gameObject = ALIEN
+    for (var i = 1; i < board.length; i++) {
+        for (var j = 3; j < board[0].length; j++) {
+            if (i < ALIENS_ROW_COUNT + 1 && j < ALIENS_ROW_LENGTH + 2) {
+                gBoard[i][j].gameObject = ALIEN
                 gGame.aliensCount++
             }
         }
@@ -28,63 +30,170 @@ function createAliens(board) {
 }
 
 function handleAlienHit(pos) {
-    gBoard[pos.i][pos.j] = SKY
-    renderCell(pos, SKY)
-    clearInterval(gShootInterval)
+    playSound('sound/hit.wav')
+    updateCell(pos, SKY)
     gGame.aliensCount--
     updateScore(10)
     checkWin()
 }
 
-function shiftBoardRight(board, fromI, toI) {
-
-    var locations = findAliensLocation(board, fromI)
-    removeInvader(locations, fromI)
-    addInvader(locations, 1)
-    setTimeout(() => {
-
-        shiftBoardRight
-    }, 100);
-
-
-}
-
-function shiftBoardLeft(board, fromI, toI) { }
-function shiftBoardDown(board, fromI, toI) { }
-// runs the interval for moving aliens side to side and down
-// it re-renders the board every time
-// when the aliens are reaching the hero row - interval stops
 function moveAliens() {
+    if (gAliensTopRowIdx === 11) {
+        openModal('Dont worry Next Time is Yours', false)
+        return
+    }
+    if (gGame.aliensCount === 0) {
+        openModal('We Survived Anther Day', true)
+        return
+    }
     if (!gIsAlienFreeze) return
-    setInterval(shiftBoardRight(gBoard, 2), 1000)
-
+    if (gGoDown) {
+        shiftBoardDown(gBoard, gAliensTopRowIdx)
+    } else if ((gGoRight) && (!gGoDown)) {
+        gRightInterval = setInterval(() => {
+            (shiftBoardRight(gBoard, gAliensTopRowIdx))
+        }, 750)
+    } else if (gGoRight == false && gGoDown === false) {
+        gLeftInterval = setInterval(() => {
+            (shiftBoardLeft(gBoard, gAliensTopRowIdx))
+        }, 750)
+    }
+    return
 }
 
-function findAliensLocation(board, row) {
+function shiftBoardRight(board, fromI) {
+    //Caculate to distance between the alien and the border
+    var diff = 0
+    for (var j = gBoard.length - 1; j < board.length; j--) {
+        var currCell = gBoard[fromI][j]
+        if (currCell.gameObject === null) {
+            diff++
+        } else if (currCell.gameObject === ALIEN) {
+            break
+        }
+    }
+
+    if (diff === 0) {
+        clearInterval(gRightInterval)
+        gGoDown = (gGoDown) ? false : true
+        moveAliens()
+        return
+    }
+
+    //runs on gBoard and find alien i,j
+    var locations = findAliensLocation(gBoard, fromI)
+
+    for (var i = locations.length - 1; i >= 0; i--) {
+
+        var cell = locations[i]
+        //modal & DOM
+        gBoard[cell.i][cell.j].gameObject = null
+        updateCell(cell, null)
+        cell.j++
+
+        //if the Cell is hitting an ARROW
+        if (gBoard[cell.i][cell.j].gameObject === LASER) {
+            handleAlienHit(cell)
+            clearInterval(gShootInterval)
+            return
+        }
+        //modal & DOM
+        gBoard[cell.i][cell.j].gameObject = ALIEN
+        updateCell(cell, ALIEN)
+    }
+}
+
+function shiftBoardLeft(board, fromI) {
+    //Caculate to distance between the alien and the border
+    var diff = 0
+    for (var j = 0; j < board.length; j++) {
+        var currCell = gBoard[fromI][j]
+        if (currCell.gameObject === null) {
+            diff++
+        } else if (currCell.gameObject === ALIEN) {
+            break
+        }
+    }
+
+    if (diff === 0) {
+        clearInterval(gLeftInterval)
+        gGoDown = true
+        moveAliens()
+        return
+    }
+    //runs on gBoard and find alien i,j
+    var locations = findAliensLocation(board, fromI)
+
+    for (var i = 0; i < locations.length; i++) {
+
+        var cell = locations[i]
+
+        //modal & DOM
+        gBoard[cell.i][cell.j].gameObject = null
+        updateCell(cell, null)
+        cell.j--
+
+        //if the Cell is hitting an ARROW
+        if (gBoard[cell.i][cell.j].gameObject === LASER) {
+            handleAlienHit(cell)
+            clearInterval(gShootInterval)
+            return
+        }
+        //modal & DOM
+        gBoard[cell.i][cell.j].gameObject = ALIEN
+        updateCell(cell, ALIEN)
+    }
+}
+
+function shiftBoardDown(board) {
+    //runs on gBoard and find alien i,j
+    var locations = findAliensLocation(board)
+
+    for (var i = locations.length - 1; i >= 0; i--) {
+
+        var cell = locations[i]
+        //modal & DOM
+        gBoard[cell.i][cell.j].gameObject = null
+        updateCell(cell, null)
+
+        cell.i++
+
+        //if the Cell is hitting an ARROW
+        if (gBoard[cell.i][cell.j].gameObject === LASER) {
+            handleAlienHit(cell)
+            clearInterval(gShootInterval)
+            return
+        }
+
+        //modal & DOM
+        gBoard[cell.i][cell.j].gameObject = ALIEN
+        updateCell(cell, ALIEN)
+    }
+
+    clearInterval(gLeftInterval)
+    if (gGoRight) {
+        gGoRight = false
+    } else gGoRight = true
+    gGoDown = false
+    gAliensTopRowIdx++
+    moveAliens()
+    return
+}
+
+function findAliensLocation(board) {
     var newArr = []
-    for (var i = 1; i < board.length; i++) {
-        var currCell = gBoard[row][i]
-        if (currCell.gameObject === ALIEN)
-            newArr.push({ i: row, j: i })
+    for (var i = 0; i < board.length; i++) {
+        var currCell = gBoard[i]
+        for (var j = 0; j < board[i].length; j++) {
+            var cell = currCell[j]
+            if (cell.gameObject === ALIEN) {
+                newArr.push({ i: i, j: j })
+            }
+        }
     }
     return newArr
 }
 
 
-function removeInvader(locations) {
-    for (var i = 1; i < locations.length + 1; i++) {
-        var lastCell = locations[locations.length - i]
-        console.log(lastCell)
-        updateCell(lastCell, null)
-    }
-}
 
-function addInvader(locations, num) {
-    for (var i = 1; i < locations.length + 1; i++) {
-        var lastCell = locations[locations.length - i]
-        lastCell.j += num
-        console.log(lastCell)
-        updateCell(lastCell, ALIEN)
-    }
-}
 

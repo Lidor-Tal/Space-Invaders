@@ -58,3 +58,8 @@ function getClassName(location) {
     var cellClass = 'cell-' + location.i + '-' + location.j;
     return cellClass;
 }
+
+function playSound(path) {
+    var audio = new Audio(path);
+    audio.play()
+}

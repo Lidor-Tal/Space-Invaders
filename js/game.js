@@ -3,8 +3,8 @@
 const BOARD_SIZE = 14;
 const ALIENS_ROW_LENGTH = 8
 const ALIENS_ROW_COUNT = 3
-const HERO = '♆';
-const ALIEN = '👽'
+const HERO = `<img src="img/spaceship.png" alt="" srcset="">`
+const ALIEN = '👾'
 const LASER = '⤊';
 
 const SKY = ''
@@ -22,7 +22,7 @@ function init() {
     createHero(gBoard)
 
     renderBoard(gBoard, '.board-container')
-    moveAliens()
+    // moveAliens()
 }
 
 function createBoard() {
@@ -48,14 +48,16 @@ function updateScore(diff) {
 
 function checkWin() {
     if (gGame.aliensCount === 0) {
-        openModal('win', true)
+        openModal('We Survived Anther Day', true)
     }
 }
 
 function openModal(text, isWin) {
+    clearInterval(gLeftInterval)
+    clearInterval(gLeftInterval)
     gGame.isOn = false
     var strColor = ''
-    strColor += (isWin) ? 'green' : 'red'
+    strColor += (isWin) ? 'lightgreen' : 'lightblue'
 
     var elModal = document.querySelector('.modal')
     var elBtn = document.querySelector('.btn')
@@ -69,11 +71,20 @@ function openModal(text, isWin) {
 }
 
 function restartGame() {
+    clearInterval(gIntervalAliens)
+    clearInterval(gLeftInterval)
+    clearInterval(gRightInterval)
+    clearInterval(gShootInterval)
+    gAliensTopRowIdx = 2
+    gGoDown = false
+    gGoRight = true
+
     gGame = {
         isOn: true,
         aliensCount: 0,
         score: 0
     }
+
     gBoard = []
     var elScore = document.querySelector('h2 span')
     var elModal = document.querySelector('.modal')
@@ -92,8 +103,7 @@ function createCell(gameObject = null) {
 }
 
 function updateCell(pos, gameObject = null) {
-    gBoard[pos.i][pos.j].gameObject = gameObject;
+    gBoard[pos.i][pos.j].gameObject = gameObject
     var elCell = getElCell(pos);
-    console.log(elCell)
     elCell.innerHTML = gameObject || '';
 }

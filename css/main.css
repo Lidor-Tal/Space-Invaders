@@ -4,6 +4,8 @@ body {
     text-align: center;
     margin: auto;
     font-size: 10px;
+    background-image: url('/img/backGround.png');
+
 }
 
 h1 {
@@ -15,8 +17,9 @@ h2 {
 }
 
 .board-container {
-    width: 400px;
-    height: 400px;
+    background-image: url('/img/space.png');
+    width: 50%;
+    height: 470px;
     background-color: rgb(78, 78, 78);
     margin: auto;
     border: 0.5px white solid;
@@ -29,10 +32,9 @@ table {
 }
 
 .cell {
-    border: 0.5px rgb(149, 149, 149) solid;
 
-    width: 23px;
-    height: 23px;
+    width: 30px;
+    height: 30px;
     text-align: center;
     font-size: 1.5em;
 }
@@ -59,4 +61,9 @@ table {
 .gameResult {
     font-size: 30px;
     padding: 20px;
+}
+
+img {
+    width: 30px;
+    height: 30px;
 }
