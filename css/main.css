@@ -4,7 +4,7 @@ body {
     text-align: center;
     margin: auto;
     font-size: 10px;
-    background-image: url('../img/backGround.png');
+    background-image: url("../img/backGround.png");
 
 }
 
@@ -25,7 +25,7 @@ h2 {
 }
 
 .board-container {
-    background-image: url('../img/space.png');
+    background-image: url("../img/space.png");
     width: 50%;
     height: 470px;
     background-color: rgb(78, 78, 78);
